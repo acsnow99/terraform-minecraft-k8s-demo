@@ -6,7 +6,7 @@ metadata:
     app: java
 spec:
   volumes:
-    - name: mc-world-storage-java
+    - name: mc-world-storage
       persistentVolumeClaim:
         claimName: mc-claim-java
   containers:
@@ -17,7 +17,7 @@ spec:
           name: "mc-server"
       volumeMounts:
         - mountPath: "/data"
-          name: mc-world-storage-java
+          name: mc-world-storage
       env:
       - name: EULA
         value: "true"
