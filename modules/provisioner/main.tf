@@ -19,7 +19,7 @@ data "template_file" "server-properties" {
 
 resource "null_resource" "deploy-with-server-properties" {
     provisioner "local-exec" {
-        command = "echo '${data.template_file.deploy.rendered}' > resources/mc-pod-provisioned.yaml && gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && kubectl apply -f resources/mc-pod-provisioned.yaml && rm resources/mc-pod-provisioned.yaml"
+        command = "echo '${data.template_file.deploy.rendered}' > resources/mc-pod-provisioned.yaml && gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && gcloud compute disks create ${lookup("${var.disk-names}", "${var.java}")} --zone us-west1-a && kubectl apply -f resources/mc-pod-provisioned.yaml && rm resources/mc-pod-provisioned.yaml"
     }
 
 

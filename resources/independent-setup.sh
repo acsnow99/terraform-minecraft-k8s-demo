@@ -1,24 +1,3 @@
-echo '${data.template_file.deploy.rendered}' > resources/mc-pod-provisioned.yaml 
-gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project}
-kubectl apply -f resources/mc-pod-provisioned.yaml 
-rm resources/mc-pod-provisioned.yaml
-echo '${data.template_file.server-properties.rendered}' > ./resources/server.properties.provisioned 
-gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} 
-sleep 60 && kubectl cp ./resources/server.properties.provisioned ${lookup("${var.pod-names}", "${var.java}")}:/data/server.properties 
-kubectl exec -it ${lookup("${var.pod-names}", "${var.java}")} chmod 777 /data/server.properties 
-rm ./resources/server.properties.provisioned
-
-
-kubectl exec -it ${lookup("${var.pod-names}", "${var.java}")} rcon-cli stop
-
-#-or-
-
-kubectl exec ${lookup("${var.pod-names}", "${var.java}")} -- /bin/sh -c 'kill 1'
-
-
-
-
-
 #!/bin/bash
 # base code from https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
 
@@ -29,15 +8,18 @@ modpath=""
 worldtype=DEFAULT
 modpack=""
 server-type=VANILLA
+zone="us-west1-a"
 
 # Parse options to the `mc-server` command
-while getopts ":hc:bg:w:v:m:f:r" opt; do
+while getopts ":hc:p:z:bg:w:v:m:f:r" opt; do
   case ${opt} in
    h )
      echo "
 Usage:
 
 -c Name of the cluster to set this up in
+-p GCP project
+-z GCP zone
 
 -r Sets up a Bedrock server, ignoring these options: -vmbf
 -g Gamemode of the server(0 or 1 on Java; survival or creative on Bedrock)
@@ -54,6 +36,12 @@ Other Note: Using both -m and -f will only activate -m
      ;;
    c )
      clustername=$OPTARG
+     ;;
+   p )
+     project=$OPTARG
+     ;;
+   z )
+     zone=$OPTARG
      ;;
    r )
      bedrock=true
@@ -87,6 +75,8 @@ Invalid Option: -$OPTARG
 Usage:
 
 -c Name of the cluster to set this up in
+-p GCP project
+-z GCP zone
 
 -r Sets up a Bedrock server, ignoring these options: -vmbf
 -g Gamemode of the server(0 or 1 on Java; survival or creative on Bedrock)
@@ -110,7 +100,7 @@ done
 shift $((OPTIND -1))
 
 
-        echo -e "spawn-protection=16
+echo -e "spawn-protection=16
 max-tick-time=60000
 query.port=25565
 generator-settings=
@@ -152,7 +142,7 @@ level-seed=
 use-native-transport=true
 prevent-proxy-connections=false
 motd=A Minecraft Server powered by K8S
-enable-rcon=true" > resources/server.properties.provisioned
+enable-rcon=true" > ./server.properties.provisioned
 
 echo 'kind: Pod
 apiVersion: v1
@@ -180,7 +170,7 @@ spec:
       - name: VERSION
         value: '"${release}"'
       - name: TYPE
-        value: '"${type}"'
+        value: '"${server-type}"'
 
 ---
 
@@ -228,7 +218,6 @@ Continue(y or n)?"
 
 
     #ACTUAL RUN SCRIPT FOR A BEDROCK SERVER
-    gcloud container clusters get-credentials $clustername --zone $zone --project $project
 
     echo -e "server-name=Alexs K8S Server\n\
 gamemode="${gamemode}"\n\
@@ -246,7 +235,7 @@ max-threads=8\n\
 level-name="${worldname}"\n\
 level-seed=\n\
 default-player-permission-level=operator\n\
-texturepack-required=false" > resources/server.properties.provisioned
+texturepack-required=false" > ./server.properties.provisioned
 
     echo 'kind: Pod
 apiVersion: v1
@@ -294,6 +283,7 @@ spec:
 
 ---
 
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -304,17 +294,15 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 5G' > ./resources/mc-pod-provisioned.yaml
+      storage: 5G' > ./mc-pod-provisioned.yaml
 
-    gcloud compute disks create disk-java --zone us-west1-a 2> errors.txt
-    kubectl apply -f ./resources/mc-pod-provisioned.yaml
+    kubectl apply -f ./mc-pod-provisioned.yaml
 
     sleep 120
 
-    kubectl cp resources/server.properties mc-server-pod-bedrock:/minecraft/server.properties
-    kubectl cp resources/server_setup.sh mc-server-pod-bedrock:/server_setup.sh
+    kubectl cp ./server.properties.provisioned mc-server-pod-bedrock:/data/server.properties
 
-    kubectl exec mc-server-pod-bedrock bash /server_setup.sh
+    kubectl exec mc-server-pod-bedrock -- /bin/sh -c 'kill 1'
 
 
 
@@ -334,15 +322,13 @@ installed. Continue(y or n)?"
 
 
   # ACTUAL RUN SCRIPT FOR MODDED SERVER
-      gcloud container clusters get-credentials $clustername --zone us-west1-a --project terraform-gcp-harbor
 
-      gcloud compute disks create disk-java --zone us-west1-a 2> errors.txt
-      kubectl apply -f ./resources/mc-pod-provisioned.yaml
+      kubectl apply -f ./mc-pod-provisioned.yaml
 
       sleep 180
 
       kubectl cp $modpath mc-server-pod-java:/data/mods/
-      kubectl cp resources/java.server.properties mc-server-pod-java:/data/server.properties
+      kubectl cp ./server.properties.provisioned mc-server-pod-java:/data/server.properties
       kubectl exec mc-server-pod-java chmod 777 server.properties
       kubectl exec mc-server-pod-java rcon-cli stop
 
@@ -369,15 +355,12 @@ installed. Continue(y or n)?"
 
 
   # ACTUAL RUN SCRIPT FOR FTB SERVER
-        
-        gcloud container clusters get-credentials $clustername --zone us-west1-a --project terraform-gcp-harbor
 
-        gcloud compute disks create disk-java --zone us-west1-a 2> errors.txt
-        kubectl apply -f ./resources/mc-pod-provisioned.yaml
+        kubectl apply -f ./mc-pod-provisioned.yaml
 
         sleep 400
 
-        kubectl cp resources/server.properties.provisioned mc-server-pod-java:/data/FeedTheBeast/server.properties
+        kubectl cp server.properties.provisioned mc-server-pod-java:/data/FeedTheBeast/server.properties
         kubectl exec mc-server-pod-java chmod 777 /data/FeedTheBeast/server.properties
         kubectl exec mc-server-pod-java rcon-cli stop
 
@@ -400,16 +383,13 @@ Server IP Address: "
 
 
   # ACTUAL RUN SCRIPT FOR VANILLA SERVER
-        gcloud container clusters get-credentials $clustername --zone us-west1-a --project terraform-gcp-harbor
-
-        gcloud compute disks create disk-java --zone us-west1-a 2> errors.txt
-        kubectl apply -f ./resources/mc-pod-provisioned.yaml
-
         
+        kubectl apply -f ./mc-pod-provisioned.yaml
+
 
         sleep 150
 
-        kubectl cp resources/server.properties.provisioned mc-server-pod-java:/data/server.properties
+        kubectl cp server.properties.provisioned mc-server-pod-java:/data/server.properties
         kubectl exec mc-server-pod-java chmod 777 server.properties
         kubectl exec mc-server-pod-java rcon-cli stop
 

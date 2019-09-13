@@ -54,3 +54,10 @@ variable "pod-names" {
         "1" = "mc-server-pod-java"
     }
 }
+variable "disk-names" {
+    type = "map"
+    default = {
+        "0" = "bedrock-disk"
+        "1" = "java-disk"
+    }
+}

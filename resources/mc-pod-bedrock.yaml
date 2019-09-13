@@ -45,6 +45,24 @@ spec:
 ---
 
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: bedrock-pv
+  labels:
+    type: local
+spec:
+  storageClassName: minecraft
+  capacity:
+    storage: 5Gi
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: bedrock-disk
+  accessModes:
+    - ReadWriteOnce
+
+---
+
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mc-claim-bedrock

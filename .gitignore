@@ -1,2 +1,3 @@
 .terraform
 *.tfstate*
+resources/independent-setup-gcp.sh
