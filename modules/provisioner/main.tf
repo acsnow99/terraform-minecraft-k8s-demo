@@ -8,8 +8,7 @@ data "template_file" "deploy" {
 }
 
 data "template_file" "server-properties" {
-    count = "${var.java}"
-    template = "${file("./resources/java.server.properties")}"
+    template = "${file("${lookup("${var.properties-file}", "${var.java}")}")}"
     
     vars = {
         worldname = "${var.worldname}"
@@ -18,14 +17,33 @@ data "template_file" "server-properties" {
 }
 
 
-resource "null_resource" "deploy" {
+resource "null_resource" "deploy-with-server-properties" {
     provisioner "local-exec" {
-        command = "echo '${data.template_file.deploy.rendered}' > resources/mc-pod-provisioned.yaml && gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && kubectl apply -f resources/mc-pod-provisioned.yaml && kubectl apply -f resources/pvc.yaml && rm resources/mc-pod-provisioned.yaml"
+        command = "echo '${data.template_file.deploy.rendered}' > resources/mc-pod-provisioned.yaml && gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && kubectl apply -f resources/mc-pod-provisioned.yaml && rm resources/mc-pod-provisioned.yaml"
+    }
+
+
+    provisioner "local-exec" {
+        command = "echo '${data.template_file.server-properties.rendered}' > ./resources/server.properties.provisioned && gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && sleep 60 && kubectl cp ./resources/server.properties.provisioned ${lookup("${var.pod-names}", "${var.java}")}:/data/server.properties && kubectl exec -it ${lookup("${var.pod-names}", "${var.java}")} chmod 777 /data/server.properties && rm ./resources/server.properties.provisioned"
     }
 }
 
-resource "null_resource" "server-properties" {
+resource "null_resource" "restart-java" {
+    count = "${var.java}"
+
+    depends_on = [null_resource.deploy-with-server-properties]
+
     provisioner "local-exec" {
-        command = "gcloud container clusters get-credentials ${var.cluster-name} --zone ${var.region}-a --project ${var.project} && kubectl cp ${lookup("${var.properties-file}", "${var.java}")} ${lookup("${var.pod-names}", "${var.java}")}:/data/server.properties"
+        command = "kubectl exec -it ${lookup("${var.pod-names}", "${var.java}")} rcon-cli stop"
+    }
+}
+
+resource "null_resource" "restart-bedrock" {
+    count = "${var.bedrock}"
+
+    depends_on = [null_resource.deploy-with-server-properties]
+
+    provisioner "local-exec" {
+        command = "kubectl exec ${lookup("${var.pod-names}", "${var.java}")} -- /bin/sh -c 'kill 1'"
     }
 }

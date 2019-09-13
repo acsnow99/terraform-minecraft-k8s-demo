@@ -51,7 +51,7 @@ variable "release" {
     default = "1.12.2"
 }
 variable "server-type" {
-    description = "This only supports VANILLA or FTB for now. Container also accepts FORGE, BUKKIT, SPIGOT, PAPER, CURSEFORGE, or SPONGEVANILLA"
+    description = "This only supports VANILLA for now. Container also accepts FORGE, BUKKIT, SPIGOT, PAPER, CURSEFORGE, FTB, or SPONGEVANILLA"
     default = "VANILLA"
 }
 

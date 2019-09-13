@@ -8,7 +8,7 @@ spec:
   volumes:
     - name: mc-world-storage-java
       persistentVolumeClaim:
-        claimName: mc-claim
+        claimName: mc-claim-java
   containers:
     - name: mc-server-container-java
       image: itzg/minecraft-server
@@ -42,3 +42,17 @@ spec:
       targetPort: 25565
   selector: 
     app: java
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mc-claim-java
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5G
