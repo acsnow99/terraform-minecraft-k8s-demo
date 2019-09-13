@@ -1,0 +1,57 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mc-server-pod-bedrock
+  labels: 
+    app: bedrock
+spec:
+  volumes:
+    - name: mc-world-storage
+      persistentVolumeClaim:
+        claimName: mc-claim-bedrock
+  containers:
+    - name: mc-server-container
+      image: itzg/minecraft-bedrock-server
+      ports:
+        - containerPort: 19132
+          name: "mc-server"
+      volumeMounts:
+        - mountPath: "/data"
+          name: mc-world-storage
+      env:
+      - name: EULA
+        value: "true"
+      - name: VERSION
+        value: ${release}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-exposer-toast
+  labels:
+    app: minecraft
+    world: toast
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: UDP
+      port: 19132
+      targetPort: 19132
+  selector: 
+    app: bedrock
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mc-claim-bedrock
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5G
