@@ -7,19 +7,15 @@ release="1.14.4"
 modpath=""
 worldtype=DEFAULT
 modpack=""
-server-type=VANILLA
+servertype=VANILLA
 zone="us-west1-a"
 
 # Parse options to the `mc-server` command
-while getopts ":hc:p:z:bg:w:v:m:f:r" opt; do
+while getopts ":hbg:w:v:m:f:r" opt; do
   case ${opt} in
    h )
      echo "
 Usage:
-
--c Name of the cluster to set this up in
--p GCP project
--z GCP zone
 
 -r Sets up a Bedrock server, ignoring these options: -vmbf
 -g Gamemode of the server(0 or 1 on Java; survival or creative on Bedrock)
@@ -33,15 +29,6 @@ Note: Make sure the modpacks and mods match the version of Minecraft under the -
 Other Note: Using both -m and -f will only activate -m
 " 1>&2
      exit 1
-     ;;
-   c )
-     clustername=$OPTARG
-     ;;
-   p )
-     project=$OPTARG
-     ;;
-   z )
-     zone=$OPTARG
      ;;
    r )
      bedrock=true
@@ -57,7 +44,7 @@ Other Note: Using both -m and -f will only activate -m
      ;;
    m )
      modded=true
-     server-type=FORGE
+     servertype=FORGE
      modpath=$OPTARG
      ;;
    b )
@@ -65,7 +52,7 @@ Other Note: Using both -m and -f will only activate -m
      ;;
    f )
      ftb=true
-     server-type=FTB
+     servertype=FTB
      modpack=$OPTARG
      ;;
    \? )
@@ -73,10 +60,6 @@ Other Note: Using both -m and -f will only activate -m
 Invalid Option: -$OPTARG
 
 Usage:
-
--c Name of the cluster to set this up in
--p GCP project
--z GCP zone
 
 -r Sets up a Bedrock server, ignoring these options: -vmbf
 -g Gamemode of the server(0 or 1 on Java; survival or creative on Bedrock)
@@ -170,7 +153,7 @@ spec:
       - name: VERSION
         value: '"${release}"'
       - name: TYPE
-        value: '"${server-type}"'
+        value: '"${servertype}"'
 
 ---
 
