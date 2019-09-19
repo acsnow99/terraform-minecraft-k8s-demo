@@ -25,6 +25,8 @@ spec:
         value: ${release}
       - name: TYPE
         value: ${server-type}
+      - name: FTB_SERVER_MOD
+        value: ${ftb-modpack}
 
 ---
 

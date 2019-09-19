@@ -29,18 +29,18 @@ bedrock = 0
 # 0 or 1 for Java, 'survival' or 'creative' for Bedrock
 gamemode = 0
 
-worldname = "GKE"
+worldname = "Toast"
 
 # version of Minecraft to deploy(if using Bedrock, this must be changed to 1.12.1.1 or an earlier Bedrock release)
-release = "1.14.4"
+release = "1.12.2"
 
 # supports FTB and VANILLA
-server-type = "VANILLA"
+server-type = "FTB"
 
 # URL of the modpack on FTB website
 ftb-modpack = "https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2690320"
 
 # 1 if from an existing world on your local machine
-exists = "0"
+exists = "1"
 # path to the existing world files. If Bedrock, point to the 'db' directory inside the world directory.
-existing-world = "~/Desktop/WvvpXPNgAAA=/db"
+existing-world = "/Users/alexsnow/Desktop/Toast"

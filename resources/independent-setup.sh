@@ -125,7 +125,7 @@ level-seed=
 use-native-transport=true
 prevent-proxy-connections=false
 motd=A Minecraft Server powered by K8S
-enable-rcon=true" > ./server.properties.provisioned
+enable-rcon=true" > ./resources/server.properties.provisioned
 
 echo 'kind: Pod
 apiVersion: v1
@@ -154,6 +154,8 @@ spec:
         value: '"${release}"'
       - name: TYPE
         value: '"${servertype}"'
+      - name: FTB_SERVER_MOD
+        value: '"${modpack}"'
 
 ---
 
@@ -184,7 +186,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 5G' > ./mc-pod-provisioned.yaml
+      storage: 5G' > ./resources/mc-pod-provisioned.yaml
 
 
 
@@ -202,23 +204,6 @@ Continue(y or n)?"
 
     #ACTUAL RUN SCRIPT FOR A BEDROCK SERVER
 
-    echo -e "server-name=Alexs K8S Server\n\
-gamemode="${gamemode}"\n\
-difficulty=normal\n\
-allow-cheats=false\n\
-max-players=10\n\
-online-mode=true\n\
-white-list=false\n\
-server-port=19132\n\
-server-portv6=19133\n\
-view-distance=32\n\
-tick-distance=4\n\
-player-idle-timeout=30\n\
-max-threads=8\n\
-level-name="${worldname}"\n\
-level-seed=\n\
-default-player-permission-level=operator\n\
-texturepack-required=false" > ./server.properties.provisioned
 
     echo 'kind: Pod
 apiVersion: v1
@@ -245,13 +230,17 @@ spec:
         value: "true"
       - name: VERSION
         value: '"${release}"'
+      - name: GAMEMODE
+        value: '"${gamemode}"'
+      - name: LEVEL_NAME
+        value: '"${worldname}"'
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: mc-exposer-toast
+  name: mc-exposer-bedrock
   labels:
     app: minecraft
     world: toast
@@ -277,15 +266,9 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 5G' > ./mc-pod-provisioned.yaml
+      storage: 5G' > ./resources/mc-pod-provisioned.yaml
 
-    kubectl apply -f ./mc-pod-provisioned.yaml
-
-    sleep 120
-
-    kubectl cp ./server.properties.provisioned mc-server-pod-bedrock:/data/server.properties
-
-    kubectl exec mc-server-pod-bedrock -- /bin/sh -c 'kill 1'
+    kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
 
 
@@ -306,14 +289,15 @@ installed. Continue(y or n)?"
 
   # ACTUAL RUN SCRIPT FOR MODDED SERVER
 
-      kubectl apply -f ./mc-pod-provisioned.yaml
+      kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
-      sleep 180
+      sleep 60
 
       kubectl cp $modpath mc-server-pod-java:/data/mods/
       kubectl cp ./server.properties.provisioned mc-server-pod-java:/data/server.properties
       kubectl exec mc-server-pod-java chmod 777 server.properties
-      kubectl exec mc-server-pod-java rcon-cli stop
+      kubectl delete pod mc-server-pod-java
+      kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
       echo "Creation complete, please wait for the server to configure.
 Server IP Address: "
@@ -339,13 +323,16 @@ installed. Continue(y or n)?"
 
   # ACTUAL RUN SCRIPT FOR FTB SERVER
 
-        kubectl apply -f ./mc-pod-provisioned.yaml
+        kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
-        sleep 400
+        sleep 60
 
-        kubectl cp server.properties.provisioned mc-server-pod-java:/data/FeedTheBeast/server.properties
+        #kubectl exec mc-server-pod-java rm /data/FeedTheBeast/server.properties
+        kubectl exec mc-server-pod-java mkdir /data/FeedTheBeast
+        kubectl cp ./resources/server.properties.provisioned mc-server-pod-java:/data/FeedTheBeast/server.properties
         kubectl exec mc-server-pod-java chmod 777 /data/FeedTheBeast/server.properties
-        kubectl exec mc-server-pod-java rcon-cli stop
+        kubectl delete pod mc-server-pod-java
+        kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
         echo "Creation complete, please wait for the server to configure.
 Server IP Address: "
@@ -367,14 +354,14 @@ Server IP Address: "
 
   # ACTUAL RUN SCRIPT FOR VANILLA SERVER
         
-        kubectl apply -f ./mc-pod-provisioned.yaml
+        kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
+        sleep 60
 
-        sleep 150
-
-        kubectl cp server.properties.provisioned mc-server-pod-java:/data/server.properties
+        kubectl cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties
         kubectl exec mc-server-pod-java chmod 777 server.properties
-        kubectl exec mc-server-pod-java rcon-cli stop
+        kubectl delete pod mc-server-pod-java
+        kubectl apply -f ./resources/mc-pod-provisioned.yaml
 
         echo "Creation complete, please wait for the server to configure.
 Server IP Address: "
@@ -390,5 +377,4 @@ Server IP Address: "
   fi
 fi
 
-rm mc-pod-provisioned.yaml
-rm server.properties.provisioned
+rm ./resources/server.properties.provisioned

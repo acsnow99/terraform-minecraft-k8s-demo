@@ -1,6 +1,6 @@
 region = "us-west1"
 
-cluster-name = "testido"
+cluster-name = "mc-server"
 
 cluster-size = 1
 
@@ -17,16 +17,15 @@ machine-type = "n1-standard-2"
 
 
 #server variables
-java = 1
+java = 0
 
-bedrock = 0
+bedrock = 1
 
-gamemode = 0
+gamemode = "creative"
 
-worldname = "GKE"
+worldname = "DOINGUS"
 
-release = "1.12.2"
+release = "1.12.1.1"
 
-server-type = "VANILLA"
-
-ftb-modpack = "https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2690320"
+exists = "1"
+existing-world = "~/Desktop/WvvpXPNgAAA=/db"

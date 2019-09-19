@@ -24,3 +24,5 @@ bedrock = 1
 gamemode = "creative"
 
 worldname = "GKE"
+
+release = "1.12.1.1"

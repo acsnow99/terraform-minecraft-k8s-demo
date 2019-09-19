@@ -59,3 +59,10 @@ variable "ftb-modpack" {
     description = "Modpack download link if using FTB server type"
     default = "https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2690320"
 }
+
+variable "exists" {
+    default = "0"
+}
+variable "existing-world" {
+    default = ""
+}

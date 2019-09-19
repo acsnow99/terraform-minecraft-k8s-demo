@@ -32,6 +32,17 @@ variable "server-type" {
     default = "VANILLA"
 }
 
+variable "ftb-modpack" {
+    default = "https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2690320"
+}
+
+variable "exists" {
+    default = "0"
+}
+variable "existing-world" {
+    default = ""
+}
+
 
 variable "kube-file" {
     type = "map"
@@ -59,5 +70,12 @@ variable "disk-names" {
     default = {
         "0" = "bedrock-disk"
         "1" = "java-disk"
+    }
+}
+variable "existing-setup-file" {
+    type = "map"
+    default = {
+        "0" = "./resources/bedrock-world-setup.sh"
+        "1" = "./resources/java-world-setup.sh"
     }
 }
