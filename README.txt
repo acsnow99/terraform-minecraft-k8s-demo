@@ -10,5 +10,3 @@ GCP service key, the project and network that the cluster will deploy to, and
 the configuration for the Minecraft server. 
 Then run "terraform apply -var-file=states/{your file}" to set up the entire environment.
 
-Notes:
-- FTB servers are not currently supported
