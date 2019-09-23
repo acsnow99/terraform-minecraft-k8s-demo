@@ -11,7 +11,7 @@ spec:
         claimName: mc-claim-bedrock
   containers:
     - name: mc-server-container
-      image: itzg/minecraft-bedrock-server
+      image: ${docker-image}
       ports:
         - containerPort: 19132
           name: "mc-server"

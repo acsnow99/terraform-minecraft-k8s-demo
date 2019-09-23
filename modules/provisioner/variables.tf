@@ -43,7 +43,19 @@ variable "existing-world" {
     default = ""
 }
 
+variable "harbor" {
+    default = "0"
+}
 
+
+variable "docker-image" {
+    type = "map"
+    default = {
+        "0" = "itzg/minecraft-bedrock-server"
+        "1" = "itzg/minecraft-server"
+        "2" = "core.harbor.domain/minecraft/minecraft-server"
+    }
+}
 variable "kube-file" {
     type = "map"
     default = {

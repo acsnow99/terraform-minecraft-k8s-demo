@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# commands run on the K8S cluster to get world files in the right place
+
 rm -r /data/${worldname} || true
 mkdir -p /data/${worldname} || true
 cp -r /tmp/db/* /data/${worldname} || true

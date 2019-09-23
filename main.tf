@@ -45,4 +45,6 @@ module "provisioner" {
   ftb-modpack = "${var.ftb-modpack}"
   exists = "${var.exists}"
   existing-world = "${var.existing-world}"
+
+  harbor = "${var.harbor}"
 }

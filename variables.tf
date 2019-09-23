@@ -66,3 +66,7 @@ variable "exists" {
 variable "existing-world" {
     default = ""
 }
+
+variable "harbor" {
+    default = "0"
+}
