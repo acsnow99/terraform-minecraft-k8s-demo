@@ -17,7 +17,7 @@ data "template_file" "deploy" {
         release = "${var.release}"
         server-type = "${var.server-type}"
         ftb-modpack = "${var.ftb-modpack}"
-        docker-image = "${lookup("${var.docker-image}", "%{ if var.harbor != "0" }${var.harbor}%{ else }${var.java}%{ endif }!")}"
+        docker-image = "${lookup("${var.docker-image}", "%{ if var.harbor != "0" }${var.harbor}%{ else }${var.java}%{ endif }")}"
     }
 }
 
