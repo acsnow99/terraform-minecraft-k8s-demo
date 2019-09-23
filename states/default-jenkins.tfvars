@@ -10,7 +10,7 @@ network = "minecraft"
 subnet = "minecraft-1"
 
 # your GCP service key
-credentials-file = "/keys/terraform-gcp-harbor-2-72245571699e.json"
+credentials-file = "/keys/terraform-gcp-harbor-2-3ca67fec4859.json"
 
 project = "terraform-gcp-harbor-2"
 
