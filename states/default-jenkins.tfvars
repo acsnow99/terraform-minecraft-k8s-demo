@@ -29,7 +29,7 @@ bedrock = 0
 # 0 or 1 for Java, 'survival' or 'creative' for Bedrock
 gamemode = 0
 
-worldname = "Jenkins'\ World"
+worldname = "Jenkins World"
 
 # version of Minecraft to deploy(if using Bedrock, this must be changed to 1.12.1.1 or an earlier Bedrock release)
 release = "1.14.4"
