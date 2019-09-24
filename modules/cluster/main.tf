@@ -28,6 +28,5 @@ resource "google_container_node_pool" "mc-server-nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
 
-    tags = ["minecraft-kube"]
   }
 }
