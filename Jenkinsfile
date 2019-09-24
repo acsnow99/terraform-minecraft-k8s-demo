@@ -8,5 +8,5 @@ node('docker') {
         sh "yes yes | terraform destroy -var-file=states/default-jenkins.tfvars -target=module.provisioner"
 
     stage 'Integration Test'
-        sh "yes yes | terraform apply -var-file=states/default-jenkins.tfvars"
+        sh "yes yes | terraform apply -var-file=states/default-jenkins-exists.tfvars"
 }
