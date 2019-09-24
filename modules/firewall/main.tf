@@ -7,7 +7,6 @@ resource "google_compute_firewall" "ssh" {
         ports    = ["22"]
     }
 
-    source_tags = ["minecraft-kube"]
 }
 
 resource "google_compute_firewall" "java" {
@@ -21,7 +20,6 @@ resource "google_compute_firewall" "java" {
         ports = ["25565"]
     }
 
-    source_tags = ["minecraft-kube"]
 }
 
 resource "google_compute_firewall" "bedrock" {
@@ -35,5 +33,4 @@ resource "google_compute_firewall" "bedrock" {
         ports = ["19132"]
     }
 
-    source_tags = ["minecraft-kube"]
 }
