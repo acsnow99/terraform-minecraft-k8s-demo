@@ -30,7 +30,7 @@ pipeline {
             steps {
         sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f resources/deployment.yaml"
         sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f resources/pvc-deployment.yaml || true"
-        sh 'kubectl -n $NAMESPACE get pods'
+        sh 'kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE get pods'
             }
         }
         stage('Server Setup') {
