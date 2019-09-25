@@ -8,6 +8,11 @@ pipeline {
     DOCKER_REPO="${HARBOR_ADDRESS}/itzg/minecraft-server"
     }
     stages {
+        stage('Cleanup') {
+            steps {
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml delete mc-server-pod-java || true"
+            }
+        }
         stage('Build') {
             steps {
         echo 'Build stuff'
@@ -35,6 +40,7 @@ pipeline {
         }
         stage('Server Setup') {
             steps {
+        sh "sleep 45"
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml exec mc-server-pod-java chmod 777 server.properties"
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml delete pod mc-server-pod-java"
