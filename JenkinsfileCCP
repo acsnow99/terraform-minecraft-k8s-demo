@@ -2,19 +2,20 @@ pipeline {
     agent any
     environment {
         HARBOR_ADDRESS = "172.21.6.192"
+        KUBECONFIG_PATH = "~/.kube/sa-config-test"
+        //~/.kube/kubeconfig-harbor-tenant.yaml
         RELEASE = "1.14.4"
     SERVERTYPE = "VANILLA"
     MODPACK = ""
+    WORLDNAME = "Jenkinte"
+    GAMEMODE = "1"
     DOCKER_REPO="${HARBOR_ADDRESS}/itzg/minecraft-server"
     }
     stages {
         stage('Build') {
             steps {
         echo 'Build stuff'
-        sh "cat resources/mc-pod-jenkins.yaml > resources/deployment.yaml"
-        sh "cat resources/pvc-jenkins.yaml > resources/pvc-deployment.yaml"
-        sh "cat resources/server.properties.jenkins > resources/server.properties.provisioned"
-        //| sed "s/{{BUILD_NUMBER}}/$BUILD_NUMBER/g"
+        sh "bash ./resources/provision-jenkins.sh"
             }
         }
         stage('Test') {
@@ -24,18 +25,18 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft apply -f resources/deployment.yaml"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft apply -f resources/pvc-deployment.yaml || true"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft apply -f resources/deployment.yaml"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft apply -f resources/pvc-deployment.yaml || true"
         sh 'kubectl -n minecraft get pods'
             }
         }
         stage('Server Setup') {
             steps {
         sh "sleep 45"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft exec mc-server-pod-java chmod 777 server.properties"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft delete pod mc-server-pod-java"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft apply -f ./resources/deployment.yaml"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft exec mc-server-pod-java chmod 777 server.properties"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft delete pod mc-server-pod-java"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n minecraft apply -f ./resources/deployment.yaml"
             }
         }
     }

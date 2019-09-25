@@ -11,7 +11,7 @@ spec:
         claimName: mc-claim-java
   containers:
     - name: mc-server-container-java
-      image: 172.21.6.192/itzg/minecraft-server
+      image: ${DOCKER_REPO}
       ports:
         - containerPort: 25565
           name: "mc-server"
@@ -22,11 +22,11 @@ spec:
       - name: EULA
         value: "true"
       - name: VERSION
-        value: 1.14.4
+        value: ${RELEASE}
       - name: TYPE
-        value: VANILLA
+        value: ${SERVERTYPE}
       - name: FTB_SERVER_MOD
-        value: ""
+        value: ${MODPACK}
 
 ---
 
