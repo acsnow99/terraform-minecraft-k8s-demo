@@ -1,4 +1,4 @@
-echo 'kind: Pod
+kind: Pod
 apiVersion: v1
 metadata:
   name: mc-server-pod-java
