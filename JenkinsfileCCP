@@ -1,8 +1,97 @@
-node('docker') {
+pipeline {
+    agent any
+    environment {
+        HARBOR_ADDRESS = "172.21.6.192"
+        RELEASE = "1.14.4"
+        HARBOR_CREDS = credentials('harboruser')
+    SERVERTYPE = "VANILLA"
+    MODPACK = ""
+    DOCKER_REPO="${HARBOR_ADDRESS}/itzg/minecraft-server"
+    }
+    stages {
+        stage('Build') {
+            steps {
+        echo 'Build stuff'
+        sh "echo 'kind: Pod
+apiVersion: v1
+metadata:
+  name: mc-server-pod-java
+  labels: 
+    app: java
+spec:
+  volumes:
+    - name: mc-world-storage
+      persistentVolumeClaim:
+        claimName: mc-claim-java
+  containers:
+    - name: mc-server-container-java
+      image: ${DOCKER_REPO}
+      ports:
+        - containerPort: 25565
+          name: "mc-server"
+      volumeMounts:
+        - mountPath: "/data"
+          name: mc-world-storage
+      env:
+      - name: EULA
+        value: "true"
+      - name: VERSION
+        value: ${RELEASE}
+      - name: TYPE
+        value: ${SERVERTYPE}
+      - name: FTB_SERVER_MOD
+        value: ${MODPACK}
 
-    stage 'Checkout'
-        checkout scm
+---
 
-    stage 'Integration Test'
-        sh "yes | bash ./resources/independent-setup.sh"
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-exposer-java
+  labels:
+    app: java
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 25565
+      targetPort: 25565
+  selector: 
+    app: java
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mc-claim-java
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5G' > ./resources/deployment.yaml"
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Run your test scripts here.'
+            }
+        }
+         stage('Deploy') {
+            steps {
+        sh 'scripts/deploy.sh'
+        kubernetesDeploy(
+            kubeconfigId: 'harbor-tenant',
+            configs: 'resources/deployment.yaml',
+            dockerCredentials: [[credentialsId: 'harboruser',
+            url: 'http://${HARBOR_ADDRESS}']],
+            secretName: 'harbor',
+            secretNamespace: 'webserver'
+        )
+        sh 'kubectl get pods'
+            }
+        }
+    }
 }
