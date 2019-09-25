@@ -1,0 +1,8 @@
+node('docker') {
+
+    stage 'Checkout'
+        checkout scm
+
+    stage 'Integration Test'
+        sh "yes | bash ./resources/independent-setup.sh"
+}

@@ -1,6 +1,6 @@
 .terraform
 *.tfstate*
 resources/independent-setup-gcp.sh
-resources/mc-pod-provisioned.yaml
+*provisioned*
 *test*
 Docker
