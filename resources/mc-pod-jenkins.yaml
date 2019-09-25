@@ -11,7 +11,7 @@ spec:
         claimName: mc-claim-java
   containers:
     - name: mc-server-container-java
-      image: ${DOCKER_REPO}
+      image: {{DOCKER_REPO}}
       ports:
         - containerPort: 25565
           name: "mc-server"
@@ -22,11 +22,11 @@ spec:
       - name: EULA
         value: "true"
       - name: VERSION
-        value: ${RELEASE}
+        value: {{RELEASE}}
       - name: TYPE
-        value: ${SERVERTYPE}
+        value: {{SERVERTYPE}}
       - name: FTB_SERVER_MOD
-        value: ${MODPACK}
+        value: {{MODPACK}}
 
 ---
 
