@@ -11,49 +11,8 @@ pipeline {
         stage('Build') {
             steps {
         echo 'Build stuff'
-        sh "echo 'kind: Pod
-apiVersion: v1
-metadata:
-  name: mc-server-pod-java
-  labels: 
-    app: java
-spec:
-  volumes:
-    - name: mc-world-storage
-      persistentVolumeClaim:
-        claimName: mc-claim-java
-  containers:
-    - name: mc-server-container-java
-      image: ${DOCKER_REPO}
-      ports:
-        - containerPort: 25565
-          name: "mc-server"
-      volumeMounts:
-        - mountPath: "/data"
-          name: mc-world-storage
-      env:
-      - name: EULA
-        value: "true"
-      - name: VERSION
-        value: ${RELEASE}
-      - name: TYPE
-        value: ${SERVERTYPE}
-      - name: FTB_SERVER_MOD
-        value: ${MODPACK}
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mc-claim-java
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5G' > ./resources/deployment.yaml"
+        sh "cat resources/mc-pod-jenkins.yaml > resources/deployment.yaml"
+        //| sed "s/{{BUILD_NUMBER}}/$BUILD_NUMBER/g"
             }
         }
         stage('Test') {

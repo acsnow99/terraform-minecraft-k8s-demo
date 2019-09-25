@@ -1,0 +1,43 @@
+echo 'kind: Pod
+apiVersion: v1
+metadata:
+  name: mc-server-pod-java
+  labels: 
+    app: java
+spec:
+  volumes:
+    - name: mc-world-storage
+      persistentVolumeClaim:
+        claimName: mc-claim-java
+  containers:
+    - name: mc-server-container-java
+      image: ${DOCKER_REPO}
+      ports:
+        - containerPort: 25565
+          name: "mc-server"
+      volumeMounts:
+        - mountPath: "/data"
+          name: mc-world-storage
+      env:
+      - name: EULA
+        value: "true"
+      - name: VERSION
+        value: 1.14.4
+      - name: TYPE
+        value: VANILLA
+      - name: FTB_SERVER_MOD
+        value: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mc-claim-java
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5G
