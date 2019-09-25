@@ -3,7 +3,7 @@ pipeline {
     environment {
         HARBOR_ADDRESS = ""
         //172.21.6.192/
-        KUBECONFIG_PATH = "~/.kube/sa-config-test"
+        KUBECONFIG_PATH = "/root/.kube/sa-config-test"
         //~/.kube/kubeconfig-harbor-tenant.yaml
         NAMESPACE = "default"
         //minecraft
