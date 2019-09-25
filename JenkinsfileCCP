@@ -13,6 +13,7 @@ pipeline {
         echo 'Build stuff'
         sh "cat resources/mc-pod-jenkins.yaml > resources/deployment.yaml"
         sh "cat resources/pvc-jenkins.yaml > resources/pvc-deployment.yaml"
+        sh "cat resources/server.properties.jenkins > resources/server.properties.provisioned"
         //| sed "s/{{BUILD_NUMBER}}/$BUILD_NUMBER/g"
             }
         }
