@@ -33,5 +33,13 @@ pipeline {
         sh 'kubectl get pods'
             }
         }
+        stage('Server Setup') {
+            steps {
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml exec mc-server-pod-java chmod 777 server.properties"
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml delete pod mc-server-pod-java"
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml apply -f ./resources/mc-pod-provisioned.yaml"
+            }
+        }
     }
 }
