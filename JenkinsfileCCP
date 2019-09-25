@@ -34,7 +34,7 @@ pipeline {
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft exec mc-server-pod-java chmod 777 server.properties"
         sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft delete pod mc-server-pod-java"
-        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft apply -f ./resources/mc-pod-provisioned.yaml"
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml -n minecraft apply -f ./resources/deployment.yaml"
             }
         }
     }
