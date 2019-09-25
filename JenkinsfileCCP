@@ -3,7 +3,6 @@ pipeline {
     environment {
         HARBOR_ADDRESS = "172.21.6.192"
         RELEASE = "1.14.4"
-        HARBOR_CREDS = credentials('harboruser')
     SERVERTYPE = "VANILLA"
     MODPACK = ""
     DOCKER_REPO="${HARBOR_ADDRESS}/itzg/minecraft-server"
@@ -45,23 +44,6 @@ spec:
 ---
 
 apiVersion: v1
-kind: Service
-metadata:
-  name: mc-exposer-java
-  labels:
-    app: java
-spec:
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 25565
-      targetPort: 25565
-  selector: 
-    app: java
-
----
-
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mc-claim-java
@@ -79,9 +61,8 @@ spec:
                 echo 'Run your test scripts here.'
             }
         }
-         stage('Deploy') {
+        stage('Deploy') {
             steps {
-        sh 'scripts/deploy.sh'
         kubernetesDeploy(
             kubeconfigId: 'harbor-tenant',
             configs: 'resources/deployment.yaml',
