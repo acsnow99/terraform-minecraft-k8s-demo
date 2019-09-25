@@ -17,6 +17,7 @@ pipeline {
             steps {
         echo 'Build stuff'
         sh "cat resources/mc-pod-jenkins.yaml > resources/deployment.yaml"
+        sh "cat resources/pvc-jenkins.yaml > resources/pvc-deployment.yaml"
         //| sed "s/{{BUILD_NUMBER}}/$BUILD_NUMBER/g"
             }
         }
@@ -27,14 +28,8 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-        kubernetesDeploy(
-            kubeconfigId: 'harbor-tenant',
-            configs: 'resources/deployment.yaml',
-            dockerCredentials: [[credentialsId: 'harboruser',
-            url: 'http://${HARBOR_ADDRESS}']],
-            secretName: 'harbor',
-            secretNamespace: 'webserver'
-        )
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml apply -f resources/deployment.yaml"
+        sh "kubectl --kubeconfig ~/.kube/kubeconfig-harbor-tenant.yaml apply -f resources/pvc-deployment.yaml || true"
         sh 'kubectl get pods'
             }
         }
