@@ -18,7 +18,7 @@ pipeline {
         stage('Build') {
             steps {
         echo 'Build stuff'
-        sh "bash ./resources/provision-jenkins.sh"
+        sh "bash ./Jenkins-java/resources/provision-jenkins.sh"
             }
         }
         stage('Test') {
@@ -28,18 +28,18 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f resources/deployment.yaml"
-        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f resources/pvc-deployment.yaml || true"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f Jenkins-java/resources/deployment.yaml"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f Jenkins-java/resources/pvc-deployment.yaml || true"
         sh 'kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE get pods'
             }
         }
         stage('Server Setup') {
             steps {
         sh "sleep 45"
-        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE cp ./resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE cp ./Jenkins-java/resources/server.properties.provisioned mc-server-pod-java:/data/server.properties"
         sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE exec mc-server-pod-java chmod 777 server.properties"
         sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE delete pod mc-server-pod-java"
-        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f ./resources/deployment.yaml"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f ./Jenkins-java/resources/deployment.yaml"
             }
         }
     }

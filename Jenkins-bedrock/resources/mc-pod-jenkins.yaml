@@ -1,0 +1,46 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mc-server-pod-java
+  labels: 
+    app: bedrock
+spec:
+  volumes:
+    - name: mc-world-storage
+      persistentVolumeClaim:
+        claimName: mc-claim-java
+  containers:
+    - name: mc-server-container-java
+      image: {{DOCKER_REPO}}
+      ports:
+        - containerPort: 25565
+          name: "mc-server"
+      volumeMounts:
+        - mountPath: "/data"
+          name: mc-world-storage
+      env:
+      - name: EULA
+        value: "true"
+      - name: VERSION
+        value: {{RELEASE}}
+      - name: LEVEL_NAME
+        value: {{WORLDNAME}}
+      - name: GAMEMODE
+        value: {{GAMEMODE}}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-exposer-java
+  labels:
+    app: java
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: UDP
+      port: 19132
+      targetPort: 19132
+  selector: 
+    app: bedrock

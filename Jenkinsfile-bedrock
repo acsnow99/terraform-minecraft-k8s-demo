@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    environment {
+        HARBOR_ADDRESS = ""
+        //172.21.6.192/
+        KUBECONFIG_PATH = "/root/.kube/sa-config-test"
+        //~/.kube/kubeconfig-harbor-tenant.yaml
+        NAMESPACE = "default"
+        //minecraft
+        RELEASE = "1.12"
+    SERVERTYPE = "VANILLA"
+    MODPACK = ""
+    WORLDNAME = "JenkinteRock"
+    GAMEMODE = "creative"
+    DOCKER_REPO="${HARBOR_ADDRESS}itzg/minecraft-bedrock-server"
+    }
+    stages {
+        stage('Build') {
+            steps {
+        echo 'Build stuff'
+        sh "bash ./Jenkins-bedrock/resources/provision-jenkins.sh"
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Run your test scripts here.'
+            }
+        }
+        stage('Deploy') {
+            steps {
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f Jenkins-bedrock/resources/deployment.yaml"
+        sh "kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE apply -f Jenkins-bedrock/resources/pvc-deployment.yaml || true"
+        sh 'kubectl --kubeconfig $KUBECONFIG_PATH -n $NAMESPACE get pods'
+            }
+        }
+    }
+}
